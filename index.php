@@ -4,6 +4,11 @@
 // Description: This is the entry point for the open-source social networking script. 
 // It initializes the application and handles incoming requests.
 
+if (!file_exists('config.php')) {
+    header('Location: install.php');
+    exit;
+}
+
 require_once 'config.php';
 require_once 'src/User.php';
 require_once 'src/Post.php';

@@ -130,3 +130,12 @@ To set up the project, follow these steps:
 
 6. Open your web browser and navigate to `http://localhost:8000` to access the application.
 
+## Installation Process
+
+If the script is not already installed, it will automatically redirect to the installation page. Follow these steps to complete the installation:
+
+1. Open your web browser and navigate to `http://localhost:8000/install.php`.
+2. The installation script will check for system requirements and prompt you to enter your database credentials.
+3. Enter the required database credentials and follow the on-screen instructions to complete the installation.
+4. Once the installation is complete, you can access the application at `http://localhost:8000`.
+
