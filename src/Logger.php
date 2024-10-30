@@ -4,11 +4,13 @@ class Logger
 {
     private $logFile;
     private $logLevel;
+    private $maxFileSize;
 
-    public function __construct($logFile, $logLevel = 'INFO')
+    public function __construct($logFile, $logLevel = 'INFO', $maxFileSize = 1048576)
     {
         $this->logFile = $logFile;
         $this->logLevel = $logLevel;
+        $this->maxFileSize = $maxFileSize;
     }
 
     public function log($message, $level = 'INFO')
@@ -16,6 +18,7 @@ class Logger
         if ($this->shouldLog($level)) {
             $timestamp = date('Y-m-d H:i:s');
             $logMessage = "[$timestamp] [$level] $message" . PHP_EOL;
+            $this->rotateLogFile();
             file_put_contents($this->logFile, $logMessage, FILE_APPEND);
         }
     }
@@ -27,6 +30,14 @@ class Logger
         $messageLevelIndex = array_search($level, $levels);
 
         return $messageLevelIndex >= $currentLevelIndex;
+    }
+
+    private function rotateLogFile()
+    {
+        if (file_exists($this->logFile) && filesize($this->logFile) >= $this->maxFileSize) {
+            $backupFile = $this->logFile . '.' . time();
+            rename($this->logFile, $backupFile);
+        }
     }
 
     public function logUserActivity($userId, $activity)

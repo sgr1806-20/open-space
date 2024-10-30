@@ -90,3 +90,43 @@ To test the terminal access functionality, you can use the `test_terminal.php` s
 
 The test script will output the results of each test case, indicating whether the test passed or failed. If a test fails, the expected and actual output will be displayed to help you identify the issue.
 
+## Setup Instructions
+
+To set up the project, follow these steps:
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/sgr1806-20/open-space.git
+   cd open-space
+   ```
+
+2. Install the required dependencies:
+   ```
+   composer install
+   ```
+
+3. Set up the database:
+   - Create a new database.
+   - Import the schema from `database/schema.sql`:
+     ```
+     mysql -u <username> -p <database_name> < database/schema.sql
+     ```
+
+4. Configure the environment variables:
+   - Create a `.env` file in the project root directory.
+   - Add the following environment variables to the `.env` file:
+     ```
+     DB_HOST=your_database_host
+     DB_NAME=your_database_name
+     DB_USER=your_database_username
+     DB_PASS=your_database_password
+     ENCRYPTION_KEY=your_encryption_key
+     ```
+
+5. Start the development server:
+   ```
+   php -S localhost:8000
+   ```
+
+6. Open your web browser and navigate to `http://localhost:8000` to access the application.
+

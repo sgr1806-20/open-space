@@ -26,9 +26,45 @@ require_once 'src/Compliance.php';
 require_once 'src/Logger.php';
 
 // Initialize the application
-// Add your initialization code here
+session_start();
+$logger = new Logger('app.log');
+$logger->log('Application initialized.');
 
 // Handle incoming requests
-// Add your request handling code here
+$requestMethod = $_SERVER['REQUEST_METHOD'];
+$requestUri = $_SERVER['REQUEST_URI'];
+
+switch ($requestMethod) {
+    case 'GET':
+        // Handle GET requests
+        if ($requestUri === '/posts') {
+            $post = new Post();
+            $posts = $post->getAllPosts();
+            echo json_encode($posts);
+        } elseif ($requestUri === '/users') {
+            $user = new User();
+            $users = $user->getAllUsers();
+            echo json_encode($users);
+        }
+        break;
+    case 'POST':
+        // Handle POST requests
+        $input = json_decode(file_get_contents('php://input'), true);
+        if ($requestUri === '/posts') {
+            $post = new Post();
+            $post->createPost($input['userId'], $input['content'], $input['mediaAttachments'], $input['privacySettings']);
+            echo json_encode(['message' => 'Post created successfully.']);
+        } elseif ($requestUri === '/users') {
+            $user = new User();
+            $user->register($input['username'], $input['email'], $input['password']);
+            echo json_encode(['message' => 'User registered successfully.']);
+        }
+        break;
+    default:
+        // Handle other request methods
+        http_response_code(405);
+        echo json_encode(['message' => 'Method not allowed.']);
+        break;
+}
 
 ?>
