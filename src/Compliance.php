@@ -2,16 +2,18 @@
 
 class Compliance
 {
-    private $userId;
-    private $dataProtectionRegulation;
+    #[\Attribute]
+    private int $userId;
+    #[\Attribute]
+    private string $dataProtectionRegulation;
 
-    public function __construct($userId, $dataProtectionRegulation)
+    public function __construct(int $userId, string $dataProtectionRegulation)
     {
         $this->userId = $userId;
         $this->dataProtectionRegulation = $dataProtectionRegulation;
     }
 
-    public function ensureGDPRCompliance($userId)
+    public function ensureGDPRCompliance(int $userId): void
     {
         // Code to ensure GDPR compliance for the user
         $this->userId = $userId;
@@ -19,7 +21,7 @@ class Compliance
         // Check if the user has consented to data processing
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT consent FROM users WHERE user_id = ?");
-        $stmt->bind_param("i", $this->userId);
+        $stmt->bind_param(userId: $this->userId);
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
@@ -28,7 +30,7 @@ class Compliance
         if ($user['consent'] !== 'yes') {
             // If the user has not consented, update the consent status
             $stmt = $db->prepare("UPDATE users SET consent = 'yes' WHERE user_id = ?");
-            $stmt->bind_param("i", $this->userId);
+            $stmt->bind_param(userId: $this->userId);
             $stmt->execute();
             $stmt->close();
         }
@@ -36,7 +38,7 @@ class Compliance
         $db->close();
     }
 
-    public function manageUserData($userId, $action)
+    public function manageUserData(int $userId, string $action): void
     {
         // Code to manage user data based on the specified action (e.g., data deletion, data export)
         $this->userId = $userId;
@@ -46,11 +48,11 @@ class Compliance
         if ($action === 'delete') {
             // Delete user data
             $stmt = $db->prepare("DELETE FROM users WHERE user_id = ?");
-            $stmt->bind_param("i", $this->userId);
+            $stmt->bind_param(userId: $this->userId);
         } elseif ($action === 'export') {
             // Export user data
             $stmt = $db->prepare("SELECT * FROM users WHERE user_id = ?");
-            $stmt->bind_param("i", $this->userId);
+            $stmt->bind_param(userId: $this->userId);
             $stmt->execute();
             $result = $stmt->get_result();
             $userData = $result->fetch_assoc();
@@ -66,12 +68,12 @@ class Compliance
         $db->close();
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getDataProtectionRegulation()
+    public function getDataProtectionRegulation(): string
     {
         return $this->dataProtectionRegulation;
     }

@@ -2,20 +2,28 @@
 
 class Search
 {
-    private $searchId;
-    private $userId;
-    private $postId;
-    private $keywords;
+    #[\Attribute]
+    private int $searchId;
+    #[\Attribute]
+    private int $userId;
+    #[\Attribute]
+    private int $postId;
+    #[\Attribute]
+    private string $keywords;
 
-    public function __construct($searchId, $userId, $postId, $keywords)
-    {
+    public function __construct(
+        int $searchId,
+        int $userId,
+        int $postId,
+        string $keywords
+    ) {
         $this->searchId = $searchId;
         $this->userId = $userId;
         $this->postId = $postId;
         $this->keywords = $keywords;
     }
 
-    public function indexContent($userId, $postId, $keywords)
+    public function indexContent(int $userId, int $postId, string $keywords): void
     {
         $this->userId = $userId;
         $this->postId = $postId;
@@ -24,13 +32,17 @@ class Search
         // Code to index content for search functionality
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO search_index (user_id, post_id, keywords) VALUES (?, ?, ?)");
-        $stmt->bind_param("iis", $this->userId, $this->postId, $this->keywords);
+        $stmt->bind_param(
+            userId: $this->userId,
+            postId: $this->postId,
+            keywords: $this->keywords
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function searchContent($keywords)
+    public function searchContent(string $keywords): array
     {
         $this->keywords = $keywords;
 
@@ -38,7 +50,7 @@ class Search
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM search_index WHERE keywords LIKE ?");
         $searchTerm = "%" . $this->keywords . "%";
-        $stmt->bind_param("s", $searchTerm);
+        $stmt->bind_param(searchTerm: $searchTerm);
         $stmt->execute();
         $result = $stmt->get_result();
         $searchResults = $result->fetch_all(MYSQLI_ASSOC);
@@ -48,22 +60,22 @@ class Search
         return $searchResults;
     }
 
-    public function getSearchId()
+    public function getSearchId(): int
     {
         return $this->searchId;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getPostId()
+    public function getPostId(): int
     {
         return $this->postId;
     }
 
-    public function getKeywords()
+    public function getKeywords(): string
     {
         return $this->keywords;
     }

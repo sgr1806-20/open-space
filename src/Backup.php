@@ -2,20 +2,28 @@
 
 class Backup
 {
-    private $backupId;
-    private $userId;
-    private $backupData;
-    private $createdAt;
+    #[\Attribute]
+    private int $backupId;
+    #[\Attribute]
+    private int $userId;
+    #[\Attribute]
+    private string $backupData;
+    #[\Attribute]
+    private string $createdAt;
 
-    public function __construct($backupId, $userId, $backupData, $createdAt)
-    {
+    public function __construct(
+        int $backupId,
+        int $userId,
+        string $backupData,
+        string $createdAt
+    ) {
         $this->backupId = $backupId;
         $this->userId = $userId;
         $this->backupData = $backupData;
         $this->createdAt = $createdAt;
     }
 
-    public function createBackup($userId, $backupData)
+    public function createBackup(int $userId, string $backupData): void
     {
         $this->userId = $userId;
         $this->backupData = $backupData;
@@ -24,13 +32,17 @@ class Backup
         // Code to insert the new backup into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO security (user_id, backup_info, created_at) VALUES (?, ?, ?)");
-        $stmt->bind_param("iss", $this->userId, $this->backupData, $this->createdAt);
+        $stmt->bind_param(
+            userId: $this->userId,
+            backupData: $this->backupData,
+            createdAt: $this->createdAt
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function manageBackup($backupId, $action)
+    public function manageBackup(int $backupId, string $action): void
     {
         $this->backupId = $backupId;
 
@@ -39,12 +51,17 @@ class Backup
 
         if ($action === 'delete') {
             $stmt = $db->prepare("DELETE FROM security WHERE security_id = ?");
-            $stmt->bind_param("i", $this->backupId);
+            $stmt->bind_param(
+                backupId: $this->backupId
+            );
         } elseif ($action === 'restore') {
             // Code to restore the backup
             // This is a placeholder, actual implementation may vary
             $stmt = $db->prepare("UPDATE security SET backup_info = ? WHERE security_id = ?");
-            $stmt->bind_param("si", $this->backupData, $this->backupId);
+            $stmt->bind_param(
+                backupData: $this->backupData,
+                backupId: $this->backupId
+            );
         }
 
         $stmt->execute();
@@ -52,14 +69,16 @@ class Backup
         $db->close();
     }
 
-    public function getBackup($backupId)
+    public function getBackup(int $backupId): array
     {
         $this->backupId = $backupId;
 
         // Code to retrieve a backup
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM security WHERE security_id = ?");
-        $stmt->bind_param("i", $this->backupId);
+        $stmt->bind_param(
+            backupId: $this->backupId
+        );
         $stmt->execute();
         $result = $stmt->get_result();
         $backup = $result->fetch_assoc();
@@ -69,22 +88,22 @@ class Backup
         return $backup;
     }
 
-    public function getBackupId()
+    public function getBackupId(): int
     {
         return $this->backupId;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getBackupData()
+    public function getBackupData(): string
     {
         return $this->backupData;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }

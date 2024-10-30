@@ -2,16 +2,30 @@
 
 class Message
 {
-    private $messageId;
-    private $senderId;
-    private $receiverId;
-    private $groupId;
-    private $content;
-    private $createdAt;
-    private $readStatus;
+    #[\Attribute]
+    private int $messageId;
+    #[\Attribute]
+    private int $senderId;
+    #[\Attribute]
+    private int $receiverId;
+    #[\Attribute]
+    private int $groupId;
+    #[\Attribute]
+    private string $content;
+    #[\Attribute]
+    private string $createdAt;
+    #[\Attribute]
+    private bool $readStatus;
 
-    public function __construct($messageId, $senderId, $receiverId, $groupId, $content, $createdAt, $readStatus)
-    {
+    public function __construct(
+        int $messageId,
+        int $senderId,
+        int $receiverId,
+        int $groupId,
+        string $content,
+        string $createdAt,
+        bool $readStatus
+    ) {
         $this->messageId = $messageId;
         $this->senderId = $senderId;
         $this->receiverId = $receiverId;
@@ -21,7 +35,7 @@ class Message
         $this->readStatus = $readStatus;
     }
 
-    public function sendMessage($senderId, $receiverId, $groupId, $content)
+    public function sendMessage(int $senderId, int $receiverId, int $groupId, string $content): void
     {
         $this->senderId = $senderId;
         $this->receiverId = $receiverId;
@@ -33,20 +47,27 @@ class Message
         // Code to insert the new message into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO messages (sender_id, receiver_id, group_id, content, created_at, read_status) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("iiissi", $this->senderId, $this->receiverId, $this->groupId, $this->content, $this->createdAt, $this->readStatus);
+        $stmt->bind_param(
+            senderId: $this->senderId,
+            receiverId: $this->receiverId,
+            groupId: $this->groupId,
+            content: $this->content,
+            createdAt: $this->createdAt,
+            readStatus: $this->readStatus
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function receiveMessage($messageId)
+    public function receiveMessage(int $messageId): array
     {
         $this->messageId = $messageId;
 
         // Code to retrieve a message from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM messages WHERE message_id = ?");
-        $stmt->bind_param("i", $this->messageId);
+        $stmt->bind_param(messageId: $this->messageId);
         $stmt->execute();
         $result = $stmt->get_result();
         $message = $result->fetch_assoc();
@@ -56,57 +77,56 @@ class Message
         return $message;
     }
 
-    public function manageMessage($messageId, $action)
+    public function manageMessage(int $messageId, string $action): void
     {
         $this->messageId = $messageId;
 
         // Code to manage a message (e.g., mark as read, delete)
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-        if ($action === 'markAsRead') {
-            $stmt = $db->prepare("UPDATE messages SET read_status = TRUE WHERE message_id = ?");
-            $stmt->bind_param("i", $this->messageId);
-        } elseif ($action === 'delete') {
-            $stmt = $db->prepare("DELETE FROM messages WHERE message_id = ?");
-            $stmt->bind_param("i", $this->messageId);
-        }
+        match ($action) {
+            'markAsRead' => $stmt = $db->prepare("UPDATE messages SET read_status = TRUE WHERE message_id = ?"),
+            'delete' => $stmt = $db->prepare("DELETE FROM messages WHERE message_id = ?"),
+            default => throw new InvalidArgumentException("Invalid action: $action")
+        };
 
+        $stmt->bind_param(messageId: $this->messageId);
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function getMessageId()
+    public function getMessageId(): int
     {
         return $this->messageId;
     }
 
-    public function getSenderId()
+    public function getSenderId(): int
     {
         return $this->senderId;
     }
 
-    public function getReceiverId()
+    public function getReceiverId(): int
     {
         return $this->receiverId;
     }
 
-    public function getGroupId()
+    public function getGroupId(): int
     {
         return $this->groupId;
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }
 
-    public function getReadStatus()
+    public function getReadStatus(): bool
     {
         return $this->readStatus;
     }

@@ -2,16 +2,30 @@
 
 class User
 {
-    private $userId;
-    private $username;
-    private $email;
-    private $password;
-    private $profileInfo;
-    private $createdAt;
-    private $updatedAt;
+    #[\Attribute]
+    private int $userId;
+    #[\Attribute]
+    private string $username;
+    #[\Attribute]
+    private string $email;
+    #[\Attribute]
+    private string $password;
+    #[\Attribute]
+    private ?string $profileInfo;
+    #[\Attribute]
+    private string $createdAt;
+    #[\Attribute]
+    private ?string $updatedAt;
 
-    public function __construct($userId, $username, $email, $password, $profileInfo, $createdAt, $updatedAt)
-    {
+    public function __construct(
+        int $userId,
+        string $username,
+        string $email,
+        string $password,
+        ?string $profileInfo,
+        string $createdAt,
+        ?string $updatedAt
+    ) {
         $this->userId = $userId;
         $this->username = $username;
         $this->email = $email;
@@ -21,7 +35,7 @@ class User
         $this->updatedAt = $updatedAt;
     }
 
-    public function register($username, $email, $password)
+    public function register(string $username, string $email, string $password): void
     {
         $this->username = $username;
         $this->email = $email;
@@ -31,34 +45,35 @@ class User
         // Code to insert the new user into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $this->username, $this->email, $this->password, $this->createdAt);
+        $stmt->bind_param(
+            username: $this->username,
+            email: $this->email,
+            password: $this->password,
+            createdAt: $this->createdAt
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function authenticate($email, $password)
+    public function authenticate(string $email, string $password): bool
     {
         $this->email = $email;
 
         // Code to authenticate a user
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->bind_param("s", $this->email);
+        $stmt->bind_param(email: $this->email);
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
         $stmt->close();
         $db->close();
 
-        if ($user && password_verify($password, $user['password'])) {
-            return true;
-        } else {
-            return false;
-        }
+        return $user && password_verify($password, $user['password']);
     }
 
-    public function updateProfile($userId, $profileInfo)
+    public function updateProfile(int $userId, string $profileInfo): void
     {
         $this->userId = $userId;
         $this->profileInfo = $profileInfo;
@@ -67,43 +82,47 @@ class User
         // Code to update user profile
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("UPDATE users SET profile_info = ?, updated_at = ? WHERE user_id = ?");
-        $stmt->bind_param("ssi", $this->profileInfo, $this->updatedAt, $this->userId);
+        $stmt->bind_param(
+            profileInfo: $this->profileInfo,
+            updatedAt: $this->updatedAt,
+            userId: $this->userId
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function getProfileInfo()
+    public function getProfileInfo(): ?string
     {
         return $this->profileInfo;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt()
+    public function getUpdatedAt(): ?string
     {
         return $this->updatedAt;
     }

@@ -2,14 +2,24 @@
 
 class Advertisement
 {
-    private $adId;
-    private $userId;
-    private $adContent;
-    private $createdAt;
-    private $targetingInfo;
+    #[\Attribute]
+    private int $adId;
+    #[\Attribute]
+    private int $userId;
+    #[\Attribute]
+    private string $adContent;
+    #[\Attribute]
+    private string $createdAt;
+    #[\Attribute]
+    private string $targetingInfo;
 
-    public function __construct($adId, $userId, $adContent, $createdAt, $targetingInfo)
-    {
+    public function __construct(
+        int $adId,
+        int $userId,
+        string $adContent,
+        string $createdAt,
+        string $targetingInfo
+    ) {
         $this->adId = $adId;
         $this->userId = $userId;
         $this->adContent = $adContent;
@@ -17,7 +27,7 @@ class Advertisement
         $this->targetingInfo = $targetingInfo;
     }
 
-    public function createAd($userId, $adContent, $targetingInfo)
+    public function createAd(int $userId, string $adContent, string $targetingInfo): void
     {
         $this->userId = $userId;
         $this->adContent = $adContent;
@@ -27,13 +37,18 @@ class Advertisement
         // Code to insert the new advertisement into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO advertisements (user_id, ad_content, created_at, targeting_info) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $this->userId, $this->adContent, $this->createdAt, $this->targetingInfo);
+        $stmt->bind_param(
+            userId: $this->userId,
+            adContent: $this->adContent,
+            createdAt: $this->createdAt,
+            targetingInfo: $this->targetingInfo
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function manageAd($adId, $adContent, $targetingInfo)
+    public function manageAd(int $adId, string $adContent, string $targetingInfo): void
     {
         $this->adId = $adId;
         $this->adContent = $adContent;
@@ -42,13 +57,17 @@ class Advertisement
         // Code to update the existing advertisement in the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("UPDATE advertisements SET ad_content = ?, targeting_info = ? WHERE ad_id = ?");
-        $stmt->bind_param("ssi", $this->adContent, $this->targetingInfo, $this->adId);
+        $stmt->bind_param(
+            adContent: $this->adContent,
+            targetingInfo: $this->targetingInfo,
+            adId: $this->adId
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function targetAd($adId, $targetingInfo)
+    public function targetAd(int $adId, string $targetingInfo): void
     {
         $this->adId = $adId;
         $this->targetingInfo = $targetingInfo;
@@ -56,33 +75,36 @@ class Advertisement
         // Code to update the targeting information of the advertisement
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("UPDATE advertisements SET targeting_info = ? WHERE ad_id = ?");
-        $stmt->bind_param("si", $this->targetingInfo, $this->adId);
+        $stmt->bind_param(
+            targetingInfo: $this->targetingInfo,
+            adId: $this->adId
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function getAdId()
+    public function getAdId(): int
     {
         return $this->adId;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getAdContent()
+    public function getAdContent(): string
     {
         return $this->adContent;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }
 
-    public function getTargetingInfo()
+    public function getTargetingInfo(): string
     {
         return $this->targetingInfo;
     }

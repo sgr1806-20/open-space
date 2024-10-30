@@ -2,16 +2,30 @@
 
 class Post
 {
-    private $postId;
-    private $userId;
-    private $content;
-    private $mediaAttachments;
-    private $createdAt;
-    private $updatedAt;
-    private $privacySettings;
+    #[\Attribute]
+    private int $postId;
+    #[\Attribute]
+    private int $userId;
+    #[\Attribute]
+    private string $content;
+    #[\Attribute]
+    private string $mediaAttachments;
+    #[\Attribute]
+    private string $createdAt;
+    #[\Attribute]
+    private string $updatedAt;
+    #[\Attribute]
+    private string $privacySettings;
 
-    public function __construct($postId, $userId, $content, $mediaAttachments, $createdAt, $updatedAt, $privacySettings)
-    {
+    public function __construct(
+        int $postId,
+        int $userId,
+        string $content,
+        string $mediaAttachments,
+        string $createdAt,
+        string $updatedAt,
+        string $privacySettings
+    ) {
         $this->postId = $postId;
         $this->userId = $userId;
         $this->content = $content;
@@ -21,7 +35,7 @@ class Post
         $this->privacySettings = $privacySettings;
     }
 
-    public function createPost($userId, $content, $mediaAttachments, $privacySettings)
+    public function createPost(int $userId, string $content, string $mediaAttachments, string $privacySettings): void
     {
         $this->userId = $userId;
         $this->content = $content;
@@ -32,13 +46,19 @@ class Post
         // Code to insert the new post into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO posts (user_id, content, media_attachments, created_at, privacy_settings) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("issss", $this->userId, $this->content, $this->mediaAttachments, $this->createdAt, $this->privacySettings);
+        $stmt->bind_param(
+            userId: $this->userId,
+            content: $this->content,
+            mediaAttachments: $this->mediaAttachments,
+            createdAt: $this->createdAt,
+            privacySettings: $this->privacySettings
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function editPost($postId, $content, $mediaAttachments, $privacySettings)
+    public function editPost(int $postId, string $content, string $mediaAttachments, string $privacySettings): void
     {
         $this->postId = $postId;
         $this->content = $content;
@@ -49,33 +69,39 @@ class Post
         // Code to update the existing post in the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("UPDATE posts SET content = ?, media_attachments = ?, updated_at = ?, privacy_settings = ? WHERE post_id = ?");
-        $stmt->bind_param("ssssi", $this->content, $this->mediaAttachments, $this->updatedAt, $this->privacySettings, $this->postId);
+        $stmt->bind_param(
+            content: $this->content,
+            mediaAttachments: $this->mediaAttachments,
+            updatedAt: $this->updatedAt,
+            privacySettings: $this->privacySettings,
+            postId: $this->postId
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function deletePost($postId)
+    public function deletePost(int $postId): void
     {
         $this->postId = $postId;
 
         // Code to delete the post from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("DELETE FROM posts WHERE post_id = ?");
-        $stmt->bind_param("i", $this->postId);
+        $stmt->bind_param(postId: $this->postId);
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function getPost($postId)
+    public function getPost(int $postId): array
     {
         $this->postId = $postId;
 
         // Code to retrieve the post from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM posts WHERE post_id = ?");
-        $stmt->bind_param("i", $this->postId);
+        $stmt->bind_param(postId: $this->postId);
         $stmt->execute();
         $result = $stmt->get_result();
         $post = $result->fetch_assoc();
@@ -85,37 +111,37 @@ class Post
         return $post;
     }
 
-    public function getPostId()
+    public function getPostId(): int
     {
         return $this->postId;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    public function getMediaAttachments()
+    public function getMediaAttachments(): string
     {
         return $this->mediaAttachments;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt()
+    public function getUpdatedAt(): string
     {
         return $this->updatedAt;
     }
 
-    public function getPrivacySettings()
+    public function getPrivacySettings(): string
     {
         return $this->privacySettings;
     }

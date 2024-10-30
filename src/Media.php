@@ -2,14 +2,24 @@
 
 class Media
 {
-    private $mediaId;
-    private $userId;
-    private $filePath;
-    private $fileType;
-    private $createdAt;
+    #[\Attribute]
+    private int $mediaId;
+    #[\Attribute]
+    private int $userId;
+    #[\Attribute]
+    private string $filePath;
+    #[\Attribute]
+    private string $fileType;
+    #[\Attribute]
+    private string $createdAt;
 
-    public function __construct($mediaId, $userId, $filePath, $fileType, $createdAt)
-    {
+    public function __construct(
+        int $mediaId,
+        int $userId,
+        string $filePath,
+        string $fileType,
+        string $createdAt
+    ) {
         $this->mediaId = $mediaId;
         $this->userId = $userId;
         $this->filePath = $filePath;
@@ -17,7 +27,7 @@ class Media
         $this->createdAt = $createdAt;
     }
 
-    public function uploadMedia($userId, $filePath, $fileType)
+    public function uploadMedia(int $userId, string $filePath, string $fileType): void
     {
         $this->userId = $userId;
         $this->filePath = $filePath;
@@ -27,20 +37,25 @@ class Media
         // Code to insert the new media file into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO media (user_id, file_path, file_type, created_at) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $this->userId, $this->filePath, $this->fileType, $this->createdAt);
+        $stmt->bind_param(
+            userId: $this->userId,
+            filePath: $this->filePath,
+            fileType: $this->fileType,
+            createdAt: $this->createdAt
+        );
         $stmt->execute();
         $stmt->close();
         $db->close();
     }
 
-    public function retrieveMedia($mediaId)
+    public function retrieveMedia(int $mediaId): array
     {
         $this->mediaId = $mediaId;
 
         // Code to retrieve a media file from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM media WHERE media_id = ?");
-        $stmt->bind_param("i", $this->mediaId);
+        $stmt->bind_param(mediaId: $this->mediaId);
         $stmt->execute();
         $result = $stmt->get_result();
         $media = $result->fetch_assoc();
@@ -50,21 +65,27 @@ class Media
         return $media;
     }
 
-    public function manageMedia($mediaId, $action)
+    public function manageMedia(int $mediaId, string $action): void
     {
         $this->mediaId = $mediaId;
 
         // Code to manage a media file (e.g., delete, update)
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-        if ($action === 'delete') {
-            $stmt = $db->prepare("DELETE FROM media WHERE media_id = ?");
-            $stmt->bind_param("i", $this->mediaId);
-        } elseif ($action === 'update') {
-            // Code to update the media file
-            // This is a placeholder, actual implementation may vary
-            $stmt = $db->prepare("UPDATE media SET file_path = ?, file_type = ? WHERE media_id = ?");
-            $stmt->bind_param("ssi", $this->filePath, $this->fileType, $this->mediaId);
+        match ($action) {
+            'delete' => $stmt = $db->prepare("DELETE FROM media WHERE media_id = ?"),
+            'update' => $stmt = $db->prepare("UPDATE media SET file_path = ?, file_type = ? WHERE media_id = ?"),
+            default => throw new InvalidArgumentException("Invalid action: $action")
+        };
+
+        if ($action === 'update') {
+            $stmt->bind_param(
+                filePath: $this->filePath,
+                fileType: $this->fileType,
+                mediaId: $this->mediaId
+            );
+        } else {
+            $stmt->bind_param(mediaId: $this->mediaId);
         }
 
         $stmt->execute();
@@ -72,27 +93,27 @@ class Media
         $db->close();
     }
 
-    public function getMediaId()
+    public function getMediaId(): int
     {
         return $this->mediaId;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->filePath;
     }
 
-    public function getFileType()
+    public function getFileType(): string
     {
         return $this->fileType;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }
