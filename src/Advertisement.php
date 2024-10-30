@@ -19,17 +19,47 @@ class Advertisement
 
     public function createAd($userId, $adContent, $targetingInfo)
     {
-        // Code to create a new advertisement
+        $this->userId = $userId;
+        $this->adContent = $adContent;
+        $this->targetingInfo = $targetingInfo;
+        $this->createdAt = date('Y-m-d H:i:s');
+
+        // Code to insert the new advertisement into the database
+        $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $stmt = $db->prepare("INSERT INTO advertisements (user_id, ad_content, created_at, targeting_info) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("isss", $this->userId, $this->adContent, $this->createdAt, $this->targetingInfo);
+        $stmt->execute();
+        $stmt->close();
+        $db->close();
     }
 
     public function manageAd($adId, $adContent, $targetingInfo)
     {
-        // Code to manage an existing advertisement
+        $this->adId = $adId;
+        $this->adContent = $adContent;
+        $this->targetingInfo = $targetingInfo;
+
+        // Code to update the existing advertisement in the database
+        $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $stmt = $db->prepare("UPDATE advertisements SET ad_content = ?, targeting_info = ? WHERE ad_id = ?");
+        $stmt->bind_param("ssi", $this->adContent, $this->targetingInfo, $this->adId);
+        $stmt->execute();
+        $stmt->close();
+        $db->close();
     }
 
     public function targetAd($adId, $targetingInfo)
     {
-        // Code to target an advertisement
+        $this->adId = $adId;
+        $this->targetingInfo = $targetingInfo;
+
+        // Code to update the targeting information of the advertisement
+        $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $stmt = $db->prepare("UPDATE advertisements SET targeting_info = ? WHERE ad_id = ?");
+        $stmt->bind_param("si", $this->targetingInfo, $this->adId);
+        $stmt->execute();
+        $stmt->close();
+        $db->close();
     }
 
     public function getAdId()

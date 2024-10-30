@@ -44,5 +44,12 @@ class Logger
     public function monitorSystemPerformance()
     {
         // Code to monitor system performance
+        $cpuUsage = sys_getloadavg();
+        $memoryUsage = memory_get_usage(true);
+        $diskUsage = disk_free_space("/");
+
+        $this->log("CPU Usage: " . implode(", ", $cpuUsage), 'INFO');
+        $this->log("Memory Usage: $memoryUsage", 'INFO');
+        $this->log("Disk Usage: $diskUsage", 'INFO');
     }
 }

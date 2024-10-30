@@ -15,22 +15,29 @@ class Security
 
     public function encryptData($data)
     {
-        // Code to encrypt data
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(ENCRYPTION_ALGORITHM));
+        $encryptedData = openssl_encrypt($data, ENCRYPTION_ALGORITHM, $this->encryptionKey, 0, $iv);
+        return base64_encode($encryptedData . '::' . $iv);
     }
 
     public function decryptData($encryptedData)
     {
-        // Code to decrypt data
+        list($encryptedData, $iv) = explode('::', base64_decode($encryptedData), 2);
+        return openssl_decrypt($encryptedData, ENCRYPTION_ALGORITHM, $this->encryptionKey, 0, $iv);
     }
 
     public function applyRateLimit($userId)
     {
-        // Code to apply rate limiting
+        // Placeholder code for applying rate limiting
+        // Actual implementation may vary
+        $this->rateLimit = true;
     }
 
     public function moderateContent($content)
     {
-        // Code to moderate content
+        // Placeholder code for moderating content
+        // Actual implementation may vary
+        $this->contentModeration = true;
     }
 
     public function getEncryptionKey()
