@@ -32,11 +32,7 @@ class Backup
         // Code to insert the new backup into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO security (user_id, backup_info, created_at) VALUES (?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            backupData: $this->backupData,
-            createdAt: $this->createdAt
-        );
+        $stmt->bind_param('iss', $this->userId, $this->backupData, $this->createdAt);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -51,17 +47,12 @@ class Backup
 
         if ($action === 'delete') {
             $stmt = $db->prepare("DELETE FROM security WHERE security_id = ?");
-            $stmt->bind_param(
-                backupId: $this->backupId
-            );
+            $stmt->bind_param('i', $this->backupId);
         } elseif ($action === 'restore') {
             // Code to restore the backup
             // This is a placeholder, actual implementation may vary
             $stmt = $db->prepare("UPDATE security SET backup_info = ? WHERE security_id = ?");
-            $stmt->bind_param(
-                backupData: $this->backupData,
-                backupId: $this->backupId
-            );
+            $stmt->bind_param('si', $this->backupData, $this->backupId);
         }
 
         $stmt->execute();
@@ -76,9 +67,7 @@ class Backup
         // Code to retrieve a backup
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM security WHERE security_id = ?");
-        $stmt->bind_param(
-            backupId: $this->backupId
-        );
+        $stmt->bind_param('i', $this->backupId);
         $stmt->execute();
         $result = $stmt->get_result();
         $backup = $result->fetch_assoc();

@@ -37,12 +37,7 @@ class Media
         // Code to insert the new media file into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO media (user_id, file_path, file_type, created_at) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            filePath: $this->filePath,
-            fileType: $this->fileType,
-            createdAt: $this->createdAt
-        );
+        $stmt->bind_param('isss', $this->userId, $this->filePath, $this->fileType, $this->createdAt);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -55,7 +50,7 @@ class Media
         // Code to retrieve a media file from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM media WHERE media_id = ?");
-        $stmt->bind_param(mediaId: $this->mediaId);
+        $stmt->bind_param('i', $this->mediaId);
         $stmt->execute();
         $result = $stmt->get_result();
         $media = $result->fetch_assoc();
@@ -79,13 +74,9 @@ class Media
         };
 
         if ($action === 'update') {
-            $stmt->bind_param(
-                filePath: $this->filePath,
-                fileType: $this->fileType,
-                mediaId: $this->mediaId
-            );
+            $stmt->bind_param('ssi', $this->filePath, $this->fileType, $this->mediaId);
         } else {
-            $stmt->bind_param(mediaId: $this->mediaId);
+            $stmt->bind_param('i', $this->mediaId);
         }
 
         $stmt->execute();

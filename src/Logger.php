@@ -22,7 +22,7 @@ class Logger
             $timestamp = date('Y-m-d H:i:s');
             $logMessage = "[$timestamp] [$level] $message" . PHP_EOL;
             $this->rotateLogFile();
-            file_put_contents(filename: $this->logFile, data: $logMessage, flags: FILE_APPEND);
+            $this->writeLogAsync($logMessage);
         }
     }
 
@@ -41,6 +41,15 @@ class Logger
             $backupFile = $this->logFile . '.' . time();
             rename(from: $this->logFile, to: $backupFile);
         }
+    }
+
+    private function writeLogAsync(string $logMessage): void
+    {
+        $logFile = $this->logFile;
+        $writeLog = function() use ($logFile, $logMessage) {
+            file_put_contents(filename: $logFile, data: $logMessage, flags: FILE_APPEND);
+        };
+        $writeLog();
     }
 
     public function logUserActivity(int $userId, string $activity): void

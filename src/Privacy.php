@@ -24,10 +24,7 @@ class Privacy
         // Code to update user privacy settings in the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("UPDATE privacy_settings SET privacy_option = ? WHERE user_id = ?");
-        $stmt->bind_param(
-            privacyOption: $this->privacyOption,
-            userId: $this->userId
-        );
+        $stmt->bind_param('si', $this->privacyOption, $this->userId);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -40,7 +37,7 @@ class Privacy
         // Code to retrieve user privacy settings from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM privacy_settings WHERE user_id = ?");
-        $stmt->bind_param(userId: $this->userId);
+        $stmt->bind_param('i', $this->userId);
         $stmt->execute();
         $result = $stmt->get_result();
         $privacySettings = $result->fetch_assoc();

@@ -32,11 +32,7 @@ class APIKey
         // Code to save the generated API key to the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO api_keys (user_id, api_key, created_at) VALUES (?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            apiKey: $this->apiKey,
-            createdAt: $this->createdAt
-        );
+        $stmt->bind_param('iss', $this->userId, $this->apiKey, $this->createdAt);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -50,7 +46,7 @@ class APIKey
         // This should check if the provided API key exists in the database and is associated with a valid user
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM api_keys WHERE api_key = ?");
-        $stmt->bind_param(apiKey: $this->apiKey);
+        $stmt->bind_param('s', $this->apiKey);
         $stmt->execute();
         $result = $stmt->get_result();
         $isValid = $result->num_rows > 0;

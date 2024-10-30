@@ -37,12 +37,7 @@ class Analytics
         // Code to insert the new user activity into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO analytics (user_id, activity_type, created_at, metrics) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            activityType: $this->activityType,
-            createdAt: $this->createdAt,
-            metrics: $this->metrics
-        );
+        $stmt->bind_param('isss', $this->userId, $this->activityType, $this->createdAt, $this->metrics);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -55,7 +50,7 @@ class Analytics
         // Code to retrieve and report user activity from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM analytics WHERE analytics_id = ?");
-        $stmt->bind_param(analyticsId: $this->analyticsId);
+        $stmt->bind_param('i', $this->analyticsId);
         $stmt->execute();
         $result = $stmt->get_result();
         $activity = $result->fetch_assoc();

@@ -37,12 +37,7 @@ class Poll
         // Code to insert the new poll into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO polls (user_id, poll_details, options, created_at) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            pollDetails: $this->pollDetails,
-            options: $this->options,
-            createdAt: $this->createdAt
-        );
+        $stmt->bind_param('isss', $this->userId, $this->pollDetails, $this->options, $this->createdAt);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -62,13 +57,9 @@ class Poll
         };
 
         if ($action === 'update') {
-            $stmt->bind_param(
-                pollDetails: $this->pollDetails,
-                options: $this->options,
-                pollId: $this->pollId
-            );
+            $stmt->bind_param('ssi', $this->pollDetails, $this->options, $this->pollId);
         } else {
-            $stmt->bind_param(pollId: $this->pollId);
+            $stmt->bind_param('i', $this->pollId);
         }
 
         $stmt->execute();
@@ -83,7 +74,7 @@ class Poll
         // Code to retrieve a poll
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM polls WHERE poll_id = ?");
-        $stmt->bind_param(pollId: $this->pollId);
+        $stmt->bind_param('i', $this->pollId);
         $stmt->execute();
         $result = $stmt->get_result();
         $poll = $result->fetch_assoc();

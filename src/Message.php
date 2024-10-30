@@ -47,14 +47,7 @@ class Message
         // Code to insert the new message into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO messages (sender_id, receiver_id, group_id, content, created_at, read_status) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param(
-            senderId: $this->senderId,
-            receiverId: $this->receiverId,
-            groupId: $this->groupId,
-            content: $this->content,
-            createdAt: $this->createdAt,
-            readStatus: $this->readStatus
-        );
+        $stmt->bind_param('iiissi', $this->senderId, $this->receiverId, $this->groupId, $this->content, $this->createdAt, $this->readStatus);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -67,7 +60,7 @@ class Message
         // Code to retrieve a message from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM messages WHERE message_id = ?");
-        $stmt->bind_param(messageId: $this->messageId);
+        $stmt->bind_param('i', $this->messageId);
         $stmt->execute();
         $result = $stmt->get_result();
         $message = $result->fetch_assoc();
@@ -90,7 +83,7 @@ class Message
             default => throw new InvalidArgumentException("Invalid action: $action")
         };
 
-        $stmt->bind_param(messageId: $this->messageId);
+        $stmt->bind_param('i', $this->messageId);
         $stmt->execute();
         $stmt->close();
         $db->close();

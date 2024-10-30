@@ -37,12 +37,7 @@ class Notification
         // Code to insert the new notification into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO notifications (user_id, content, created_at, read_status) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            content: $this->content,
-            createdAt: $this->createdAt,
-            readStatus: $this->readStatus
-        );
+        $stmt->bind_param('isss', $this->userId, $this->content, $this->createdAt, $this->readStatus);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -55,7 +50,7 @@ class Notification
         // Code to retrieve a notification from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM notifications WHERE notification_id = ?");
-        $stmt->bind_param(notificationId: $this->notificationId);
+        $stmt->bind_param('i', $this->notificationId);
         $stmt->execute();
         $result = $stmt->get_result();
         $notification = $result->fetch_assoc();
@@ -78,7 +73,7 @@ class Notification
             default => throw new InvalidArgumentException("Invalid action: $action")
         };
 
-        $stmt->bind_param(notificationId: $this->notificationId);
+        $stmt->bind_param('i', $this->notificationId);
         $stmt->execute();
         $stmt->close();
         $db->close();

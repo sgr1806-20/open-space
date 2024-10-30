@@ -46,13 +46,7 @@ class Post
         // Code to insert the new post into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO posts (user_id, content, media_attachments, created_at, privacy_settings) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            content: $this->content,
-            mediaAttachments: $this->mediaAttachments,
-            createdAt: $this->createdAt,
-            privacySettings: $this->privacySettings
-        );
+        $stmt->bind_param('issss', $this->userId, $this->content, $this->mediaAttachments, $this->createdAt, $this->privacySettings);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -69,13 +63,7 @@ class Post
         // Code to update the existing post in the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("UPDATE posts SET content = ?, media_attachments = ?, updated_at = ?, privacy_settings = ? WHERE post_id = ?");
-        $stmt->bind_param(
-            content: $this->content,
-            mediaAttachments: $this->mediaAttachments,
-            updatedAt: $this->updatedAt,
-            privacySettings: $this->privacySettings,
-            postId: $this->postId
-        );
+        $stmt->bind_param('ssssi', $this->content, $this->mediaAttachments, $this->updatedAt, $this->privacySettings, $this->postId);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -88,7 +76,7 @@ class Post
         // Code to delete the post from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("DELETE FROM posts WHERE post_id = ?");
-        $stmt->bind_param(postId: $this->postId);
+        $stmt->bind_param('i', $this->postId);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -101,7 +89,7 @@ class Post
         // Code to retrieve the post from the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM posts WHERE post_id = ?");
-        $stmt->bind_param(postId: $this->postId);
+        $stmt->bind_param('i', $this->postId);
         $stmt->execute();
         $result = $stmt->get_result();
         $post = $result->fetch_assoc();

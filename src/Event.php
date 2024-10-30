@@ -37,12 +37,7 @@ class Event
         // Code to insert the new event into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO events (user_id, event_details, created_at, participant_info) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            eventDetails: $this->eventDetails,
-            createdAt: $this->createdAt,
-            participantInfo: $this->participantInfo
-        );
+        $stmt->bind_param('isss', $this->userId, $this->eventDetails, $this->createdAt, $this->participantInfo);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -62,13 +57,9 @@ class Event
         };
 
         if ($action === 'update') {
-            $stmt->bind_param(
-                eventDetails: $this->eventDetails,
-                participantInfo: $this->participantInfo,
-                eventId: $this->eventId
-            );
+            $stmt->bind_param('ssi', $this->eventDetails, $this->participantInfo, $this->eventId);
         } else {
-            $stmt->bind_param(eventId: $this->eventId);
+            $stmt->bind_param('i', $this->eventId);
         }
 
         $stmt->execute();
@@ -83,7 +74,7 @@ class Event
         // Code to retrieve an event
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM events WHERE event_id = ?");
-        $stmt->bind_param(eventId: $this->eventId);
+        $stmt->bind_param('i', $this->eventId);
         $stmt->execute();
         $result = $stmt->get_result();
         $event = $result->fetch_assoc();

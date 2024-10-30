@@ -32,11 +32,7 @@ class Group
         // Code to insert the new group into the database
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("INSERT INTO groups (user_id, group_details, created_at) VALUES (?, ?, ?)");
-        $stmt->bind_param(
-            userId: $this->userId,
-            groupDetails: $this->groupDetails,
-            createdAt: $this->createdAt
-        );
+        $stmt->bind_param('iss', $this->userId, $this->groupDetails, $this->createdAt);
         $stmt->execute();
         $stmt->close();
         $db->close();
@@ -56,12 +52,9 @@ class Group
         };
 
         if ($action === 'update') {
-            $stmt->bind_param(
-                groupDetails: $this->groupDetails,
-                groupId: $this->groupId
-            );
+            $stmt->bind_param('si', $this->groupDetails, $this->groupId);
         } else {
-            $stmt->bind_param(groupId: $this->groupId);
+            $stmt->bind_param('i', $this->groupId);
         }
 
         $stmt->execute();
@@ -76,7 +69,7 @@ class Group
         // Code to retrieve a group
         $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $stmt = $db->prepare("SELECT * FROM groups WHERE group_id = ?");
-        $stmt->bind_param(groupId: $this->groupId);
+        $stmt->bind_param('i', $this->groupId);
         $stmt->execute();
         $result = $stmt->get_result();
         $group = $result->fetch_assoc();
